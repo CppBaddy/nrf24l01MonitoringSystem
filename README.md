@@ -1,4 +1,4 @@
-# nrf24l01MonitoringSystem
+# NRF24L01 Monitoring System
 NRF24L01 based wireless monitoring system. Consists of multiple WirelessBase and WirelessSensor modules.
 
 2.4GHz Wireless Dev Kit. Sensor board powered by CR2032 battery. Each sensor board has RJ11 input for landline phone line and three discrete/analog inputs, discrete outputs for other use. Sensor module detects phone ring and input change events and broadcasts these to the base controllers. Each message transmitted includes battery voltage value.
