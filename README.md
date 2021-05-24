@@ -7,11 +7,11 @@ Wireless base controller board powered by 12V DC. Controller drives LED strip WS
 
 You need to assighn unique board IDs to each sensor board (see wirelessSensor/Makefile) and include these to wirelessBase too.
 
-![Wireless Sensor board schematics](https://github.com/CppBaddy/atmegaClockCalendar/blob/main/wirelessSensorSchematics.png?raw=true)
+![Wireless Sensor board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorSchematics.png?raw=true)
 
-![Wireless Sensor board schematics](https://github.com/CppBaddy/atmegaClockCalendar/blob/main/wirelessSensorSchematics.png?raw=true)
+![Wireless Sensor board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorSchematics.png?raw=true)
 
-![JLCPCB PCB](https://github.com/CppBaddy/atmegaClockCalendar/blob/main/pcb.png?raw=true)
+![JLCPCB PCB](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/pcb.png?raw=true)
 
 Original schematics and some pictures can be found ![here](https://easyeda.com/Yulay/nrf24l01-attiny85-sensor-board)
 
