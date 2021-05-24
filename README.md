@@ -7,13 +7,17 @@ Wireless base controller board powered by 12V DC. Controller drives LED strip WS
 
 You need to assighn unique board IDs to each sensor board (see wirelessSensor/Makefile) and include these to wirelessBase too.
 
+![Assembled sensor top](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorTop.png?raw=true)
+
+![Assembled sensor bottom](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorBottom.png?raw=true)
+
+![Assembled base](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessBase.png?raw=true)
+
 ![Wireless Sensor board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorSchematics.png?raw=true)
 
 ![Wireless Base board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessBaseSchematics.png?raw=true)
 
 ![JLCPCB PCB](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/pcb.png?raw=true)
-
-![Assembled boards](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessMonitor.png?raw=true)
 
 Original schematics and some pictures can be found [here](https://easyeda.com/Yulay/nrf24l01-attiny85-sensor-board)
 
