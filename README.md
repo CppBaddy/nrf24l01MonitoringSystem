@@ -9,7 +9,7 @@ You need to assighn unique board IDs to each sensor board (see wirelessSensor/Ma
 
 ![Wireless Sensor board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorSchematics.png?raw=true)
 
-![Wireless Sensor board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessSensorSchematics.png?raw=true)
+![Wireless Base board schematics](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/wirelessBaseSchematics.png?raw=true)
 
 ![JLCPCB PCB](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/pcb.png?raw=true)
 
