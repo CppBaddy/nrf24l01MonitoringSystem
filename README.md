@@ -13,5 +13,5 @@ You need to assighn unique board IDs to each sensor board (see wirelessSensor/Ma
 
 ![JLCPCB PCB](https://github.com/CppBaddy/nrf24l01MonitoringSystem/blob/main/pcb.png?raw=true)
 
-Original schematics and some pictures can be found ![here](https://easyeda.com/Yulay/nrf24l01-attiny85-sensor-board)
+Original schematics and some pictures can be found [here](https://easyeda.com/Yulay/nrf24l01-attiny85-sensor-board)
 
