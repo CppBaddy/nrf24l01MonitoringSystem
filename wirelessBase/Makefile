@@ -1,5 +1,3 @@
-SENSOR_ID=36
-
 CC=avr-gcc
 
 DEVICE=84
@@ -15,7 +13,6 @@ CFLAGS=-g -std=c11 -Os -Wall -mcall-prologues -mmcu=attiny$(DEVICE) -DF_CPU=$(CP
 ## Use short (8-bit) data types
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -I/usr/lib/avr/include
-CFLAGS +=  -DSENSOR_ID=$(SENSOR_ID)
 
 LDFLAGS = -Wl,-Map,$(TARGET).map
 ## Optional, but often ends up with smaller code

@@ -9,6 +9,9 @@
 
 #include "PortConfig.h"
 #include "Receiver.h"
+#include "SensorModel.h"
+#include "ws2811.h"
+#include "Color24.h"
 //#include "Uart.h"
 
 
@@ -78,26 +81,29 @@ volatile bool phoneRing;
 
 #define kSensorsMax     8
 
-volatile SensorModel model[kSensorsMax];
+volatile SensorModel model;
+uint8_t timeout;
 
 volatile uint8_t timerZero;
+volatile bool animate;
 
 uint8_t prevPinA;
 
 enum { Normal, Alarm };
 
+Color24 black[] = {
+        {0, 0, 0}, { 0, 0, 0}, {  0, 0, 0}, { 0, 0, 0}
+};
 
-/* TODO:
- *      Receive RF sensor state
- *      Monitor sensor alarm state
- *      Play moving light color for alarm state with 1 sec timeout
- *      Monitor low battery voltages
- *      Flash LED if particular sensor has low battery voltage (replace battery indicator)
- */
+Color24 color[8] = {
+        {0, 0, 255}, {0, 0, 255}, {0, 0, 255}, {0, 0, 255},
+        {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}
+};
+
 int main()
 {
     uint8_t state = Normal;
-    SensorModel sm;
+    uint8_t step = 0;
 
     setup();
 
@@ -105,64 +111,92 @@ int main()
 
     RF_Init();
 
+    WS2811_Send((uint8_t*)black, 4); //switch off LED strip
+
     for(;;)
     {
-        //TODO run states
-
-        //Receive RF sensor state
-        if(nrfIRQ)
+        if(nrfIRQ) //Receive RF sensor state
         {
             nrfIRQ = false;
 
-            uint8_t s = RF_ClearIRQ();
+            /*uint8_t s =*/ RF_ClearIRQ();
             //TODO use s[3:1] as pipe # or index
 
-            RF_Receive((uint8_t*)&sm, sizeof(SensorModel));
+            RF_Receive((uint8_t*)&model, sizeof(SensorModel));
 
-            uint8_t index = sm.sensorId & 7;
-
-            model[index].sensorId = sm.sensorId;
-            model[index].alarmState = sm.alarmState;
-            model[index].inputs = sm.inputs;
-            model[index].batteryVoltage = sm.batteryVoltage;
-        }
-
-        //Monitor sensor alarm state and low battery voltage
-        for(uint8_t i=0; i < kSensorsMax; ++i)
-        {
-            if(model[i].alarmState)
+            if(model.alarmState)
             {
-                //TODO enable color light animation and clear alarm flag
-                RedOn();
+                if(Alarm != state)
+                {
+                    state = Alarm;
+                    animate = true;
+                    timeout = 24;
+
+                    Timer0_Enable();
+                }
             }
 
-            if(model[i].batteryVoltage < LOW_BATTERY_VOLTAGE)
+            if(model.batteryVoltage && model.batteryVoltage > LOW_BATTERY_VOLTAGE) //93 - 3V; 140 - 2V
             {
+                uint8_t led = model.sensorId % 3;
+
+                switch(led)
+                {
+                    case 0:
+                        RedOn();
+                        break;
+                    case 1:
+                        GreenOn();
+                        break;
+                    case 2:
+                    default:
+                        BlueOn();
+                        break;
+                }
                 //TODO start LED flashing
-                GreenOn();
             }
         }
 
-        //Play moving light color for alarm state with 1 sec timeout
-        //UpdateWS2811();
+        if(Alarm == state && animate)
+        {
+            animate = false;
 
-        //UpdateLEDs();
+            if(timeout)
+            {
+                --(timeout);
 
+                if(0 == timeout)
+                {
+                    model.alarmState = 0;
+                    state = Normal;
+                    Timer0_Disable();
 
-//        if(Alarm == state)
-//        {
-//            set_sleep_mode(SLEEP_MODE_IDLE); //to keep Timer0 & Timer1 running
-//        }
-//        else if(Normal == state)
-//        {
-//            set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-//        }
-//
-//        sleep_enable();
-//
-//            sleep_cpu();
-//
-//        sleep_disable();
+                    WS2811_Send((uint8_t*)black, 4); //switch off LED strip
+                    step = 0;
+                }
+                else
+                {
+                    if(step)
+                    {
+                        WS2811_Send((uint8_t*)black, 4); //switch off LED strip
+                        step = 0;
+                    }
+                    else
+                    {
+                        WS2811_Send((uint8_t*)color + (model.sensorId % 3), 4);
+                        step = 1;
+                    }
+                }
+            }
+        }
+
+        set_sleep_mode(SLEEP_MODE_IDLE); //to keep Timer0 & Timer1 running
+
+        sleep_enable();
+
+            sleep_cpu();
+
+        sleep_disable();
     }
 
     return 0;
@@ -179,14 +213,14 @@ void setup()
     //setup port A
     //PA0 - input IRQ from nRF24L01+
     //PA1 - reserve
-    //PA2 - input/output (reserve)
+    //PA2 - ws2811 driver
     //PA3 - CE chip enable for nRF24L01+
     //PA4 - SCK output for nRF24L01+
     //PA5 - MISO input from nRF24L01+
     //PA6 - MOSI output for nRF24L01+
     //PA7 - CSN chip select negative nRF24L01+
-    DDRA |= _BV(PA3) | _BV(PA4) | _BV(PA6) | _BV(PA7); /* set PAx as output */
-    PORTA |= _BV(PA1) | _BV(PA2) | _BV(PA7); //enable pull-ups and disable CSN
+    DDRA |= _BV(PA2) | _BV(PA3) | _BV(PA4) | _BV(PA6) | _BV(PA7); /* set PAx as output */
+    PORTA |= _BV(PA1) | _BV(PA7); //enable pull-ups and disable CSN
 
     //setup port B
     //PB0 - output RED LED
@@ -202,9 +236,9 @@ void setup()
     GIMSK |= _BV(PCIE0);  //enable PortA pin change interrupt
 
     //Timer0 update timer
-//    TCCR0A = 0;                      //normal mode
-//    TCCR0B  = _BV(CS02) | _BV(CS00); //prescaler 1024
-//    TIMSK0  |= _BV(TOIE0);           //enable TOVF interrupt
+    TCCR0A = 0;                      //normal mode
+    TCCR0B  = _BV(CS02) | _BV(CS00); //prescaler 1024
+    TIMSK0  |= _BV(TOIE0);           //enable TOVF interrupt
 
     //Timer1 uart baud rate driver
 //    TCCR1A = 0;   //CTC mode, TOP is OCR1A
@@ -225,25 +259,9 @@ void setup()
     sei(); //Enable interrupts
 }
 
-//void SendAlarmState()
-//{
-//    RF_Transmit((uint8_t*)&model, sizeof(model));
-//
-////    if(Normal == model.alarmState)
-////    {
-////        Uart_PutStr("\n\rBack to normal");
-////    }
-////    else
-////    {
-////        Uart_PutStr("\n\rAlarm!");
-////    }
-//}
-
-
 /* External input interrupt handler */
 //ISR( INT0_vect )
-//{
-//}
+//{}
 
 /* Pin change interrupt handler */
 ISR( PCINT0_vect )
@@ -260,14 +278,6 @@ ISR( PCINT0_vect )
             nrfIRQ = true;
         }
     }
-
-//    if((changed & _BV(PA1)) & PCMSK0) //enabled Phone Ringing
-//    {
-//        if((pinA & _BV(PA1)) == 0) //active low
-//        {
-//            phoneRing = true;
-//        }
-//    }
 }
 
 /* Pin change interrupt handler */
@@ -283,24 +293,17 @@ ISR( PCINT0_vect )
 //{}
 
 /* Timer0 interrupt handler */
-//ISR( TIM0_OVF_vect ) // at ~15 Hz
-//{
-//    ++timerZero;
-//
-//    if((timerZero & 3) == 0) // at ~4 Hz
-//    {
-//        stateRequest = true;
-//
-//        ADC_Enable();
-//        AdcIn_VBat();
-//    }
-//}
+ISR( TIM0_OVF_vect ) // at ~30 Hz
+{
+    ++timerZero;
+
+    if((timerZero & 0x07) == 0) // at ~8 Hz
+    {
+        animate = true;
+    }
+}
 
 // ADC interrupt service routine
 //ISR( ADC_vect )
-//{
-//    batteryVoltage = ADCH;
-//
-//    ADC_Disable();
-//}
+//{}
 

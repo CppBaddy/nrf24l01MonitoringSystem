@@ -10,6 +10,7 @@
 #include "nrf24l01.h"
 #include "nrf24l01_config.h"
 #include "Receiver.h"
+#include "SensorModel.h"
 
 #define CONFIG_RX_POWER_DOWN    (_BV(MASK_TX_DS) | _BV(MASK_MAX_RT) | _BV(EN_CRC) | _BV(CRCO))
 #define CONFIG_RX_POWER_UP      (_BV(PWR_UP) | _BV(MASK_TX_DS) | _BV(MASK_MAX_RT) | _BV(EN_CRC) | _BV(CRCO))
@@ -27,7 +28,7 @@ void RF_Init()
     //registerWrite(EN_AA, _BV(ENAA_P0)); //enable ACK for pipe 0
     registerWrite(EN_AA, 0); //disable ACK for all pipes
 
-    registerWrite(EN_RXADDR, _BV(ERX_P0) | _BV(ERX_P1) | _BV(ERX_P2) | _BV(ERX_P3) | _BV(ERX_P4) | _BV(ERX_P5)); //enable Rx addresses
+    registerWrite(EN_RXADDR, _BV(ERX_P0)/* | _BV(ERX_P1) | _BV(ERX_P2) | _BV(ERX_P3) | _BV(ERX_P4) | _BV(ERX_P5)*/); //enable Rx addresses
 
     registerWrite(SETUP_AW, 3);         //address width 5 bytes
 

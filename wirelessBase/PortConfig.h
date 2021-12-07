@@ -20,7 +20,6 @@
 #define WIRELESS_BASE_PORTCONFIG_H
 
 #include <avr/io.h>
-#include "SensorModel.h"
 
 /*
 
@@ -91,9 +90,14 @@ PB3 - Reset negative
 
 #define     NRF_PAYLOAD_SIZE    sizeof(SensorModel)
 
+//
+//WS2811 one wire port
+//
+#define     WS2811_PORT     PORTA
+#define     WS2811_DRIVER   PA2
 
 // Battery Monitor
-#define LOW_BATTERY_VOLTAGE     120
+#define LOW_BATTERY_VOLTAGE     128
 
 
 #endif //WIRELESS_BASE_PORTCONFIG_H
