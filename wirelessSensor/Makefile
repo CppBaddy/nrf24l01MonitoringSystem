@@ -1,6 +1,6 @@
 SENSOR_ID=38
 
-CC=avr-gcc
+CC=avr-g++
 
 DEVICE=84
 

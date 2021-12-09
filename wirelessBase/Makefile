@@ -1,4 +1,4 @@
-CC=avr-gcc
+CC=avr-g++
 
 DEVICE=84
 
